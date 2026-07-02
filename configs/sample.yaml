@@ -1,0 +1,33 @@
+# Sample run configuration for mizan-evals.
+#
+# Runs the sample dataset against two mock backends across all three languages.
+# Everything here works offline with no API keys. Real backends (openai, hf)
+# arrive in later milestones.
+
+name: sample-mock-run
+dataset: data/samples/eval_items.jsonl
+
+models:
+  - id: mock-small
+    backend: mock
+    params:
+      temperature: 0.0
+  - id: mock-large
+    backend: mock
+    params:
+      temperature: 0.0
+
+tasks:
+  - retrieval
+  - faithfulness
+  - answer_quality
+  - tool_calling
+
+languages:
+  - en
+  - msa
+  - gulf
+
+retrieval_k: [1, 3, 5, 10]
+seed: 0
+output_dir: runs
