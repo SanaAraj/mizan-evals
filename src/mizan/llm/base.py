@@ -7,6 +7,10 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel, ConfigDict, Field
 
 
+class BackendError(RuntimeError):
+    """Raised when a model backend fails to return a usable response."""
+
+
 class GenerationParams(BaseModel):
     """Decoding parameters that also participate in the cache key.
 
