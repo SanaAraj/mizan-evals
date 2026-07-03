@@ -14,8 +14,9 @@ venv/
 # Secrets
 .env
 
-# Evaluation run artefacts and caches
-runs/
+# Evaluation run artefacts and caches (archived runs backing published tables are tracked)
+runs/*
+!runs/archive/
 .mizan_cache/
 cache/
 
