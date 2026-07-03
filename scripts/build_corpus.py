@@ -87,9 +87,7 @@ def build_corpus(manifest_path: Path, out_path: Path) -> dict:
             title, pinned = entry["title"], int(entry["revid"])
             resolved, lastrevid, extract = _fetch_extract(client, title)
             if resolved != title:
-                raise BuildError(
-                    f"{title!r} redirected to {resolved!r}; pin the canonical title"
-                )
+                raise BuildError(f"{title!r} redirected to {resolved!r}; pin the canonical title")
             if lastrevid != pinned:
                 raise BuildError(
                     f"{title!r} advanced from pinned revid {pinned} to {lastrevid}; "
