@@ -1,0 +1,40 @@
+# Pinned Arabic Wikipedia revisions for the retrieval corpus.
+#
+# Each entry pins one article to an EXACT revision id. scripts/build_corpus.py
+# fetches the plaintext extract for the (canonical) title and refuses to build if
+# the live revision no longer matches the pinned `revid` — so the committed
+# corpus (data/corpus/arwiki.jsonl) is reproducible from a known source state.
+#
+# Titles are the canonical (post-redirect) article titles. To add or re-pin an
+# article, set `revid` to the current `lastrevid` from the API and rebuild.
+#
+# Source: Arabic Wikipedia (https://ar.wikipedia.org), text under CC BY-SA 4.0.
+# See README.md in this folder for attribution and rebuild instructions.
+
+source: "Arabic Wikipedia"
+license: "CC BY-SA 4.0"
+articles:
+  - title: "الرياض"
+    revid: 75752938
+  - title: "السعودية"
+    revid: 75722425
+  - title: "جامعة القرويين"
+    revid: 74721670
+  - title: "تركيب ضوئي"
+    revid: 75016379
+  - title: "ماء"
+    revid: 75630584
+  - title: "المجموعة الشمسية"
+    revid: 74610036
+  - title: "اللغة العربية"
+    revid: 75542937
+  - title: "ابن سينا"
+    revid: 75726802
+  - title: "نهر النيل"
+    revid: 75622945
+  - title: "قهوة"
+    revid: 75659293
+  - title: "خط عربي"
+    revid: 74768543
+  - title: "أهرام الجيزة"
+    revid: 74566758
