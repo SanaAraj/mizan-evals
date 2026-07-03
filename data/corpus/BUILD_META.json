@@ -1,0 +1,70 @@
+{
+  "source": "Arabic Wikipedia",
+  "license": "CC BY-SA 4.0",
+  "fetched_at": "2026-07-03",
+  "api": "https://ar.wikipedia.org/w/api.php",
+  "n_articles": 12,
+  "n_documents": 987,
+  "articles": [
+    {
+      "title": "الرياض",
+      "revid": 75752938,
+      "chunks": 58
+    },
+    {
+      "title": "السعودية",
+      "revid": 75722425,
+      "chunks": 229
+    },
+    {
+      "title": "جامعة القرويين",
+      "revid": 74721670,
+      "chunks": 60
+    },
+    {
+      "title": "تركيب ضوئي",
+      "revid": 75016379,
+      "chunks": 13
+    },
+    {
+      "title": "ماء",
+      "revid": 75630584,
+      "chunks": 88
+    },
+    {
+      "title": "المجموعة الشمسية",
+      "revid": 74610036,
+      "chunks": 72
+    },
+    {
+      "title": "اللغة العربية",
+      "revid": 75542937,
+      "chunks": 121
+    },
+    {
+      "title": "ابن سينا",
+      "revid": 75726802,
+      "chunks": 64
+    },
+    {
+      "title": "نهر النيل",
+      "revid": 75622945,
+      "chunks": 128
+    },
+    {
+      "title": "قهوة",
+      "revid": 75659293,
+      "chunks": 26
+    },
+    {
+      "title": "خط عربي",
+      "revid": 74768543,
+      "chunks": 109
+    },
+    {
+      "title": "أهرام الجيزة",
+      "revid": 74566758,
+      "chunks": 19
+    }
+  ]
+}
