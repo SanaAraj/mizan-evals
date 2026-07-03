@@ -94,3 +94,27 @@ tasks:
 """
     with pytest.raises(ConfigError, match="unique"):
         load_config(_write(tmp_path, dup))
+
+
+def test_model_spec_provider_fields(tmp_path: Path) -> None:
+    cfg = """
+name: providers
+dataset: d.jsonl
+models:
+  - id: gpt-5.5-2026-04-23
+    backend: openai
+  - id: Qwen/Qwen2.5-7B-Instruct
+    backend: openai
+    base_url: https://api.deepinfra.com/v1/openai
+    api_key_env: DEEPINFRA_API_KEY
+  - id: humain-ai/ALLaM-7B-Instruct-preview
+    backend: hf
+    revision: abc123
+tasks:
+  - tool_calling
+"""
+    config = load_config(_write(tmp_path, cfg))
+    assert config.models[1].base_url == "https://api.deepinfra.com/v1/openai"
+    assert config.models[1].api_key_env == "DEEPINFRA_API_KEY"
+    assert config.models[2].revision == "abc123"
+    assert config.models[0].base_url is None

@@ -23,15 +23,25 @@ class ConfigError(ValueError):
 class ModelSpec(BaseModel):
     """One system under test.
 
-    ``backend`` selects the client implementation (e.g. ``mock``; real backends
-    such as ``openai`` or ``hf`` arrive with later milestones). ``params`` are
-    passed through to the backend at call time.
+    ``backend`` selects the client implementation: ``mock`` (offline), ``openai``
+    (any OpenAI-compatible ``/chat/completions`` endpoint), or ``hf`` (a model
+    served through the Hugging Face client).
+
+    ``id`` should be the provider's exact, ideally dated/pinned model id (e.g.
+    ``gpt-5.5-2026-04-23`` or ``Qwen/Qwen2.5-7B-Instruct``); it is recorded in run
+    metadata. ``base_url`` overrides the endpoint for OpenAI-compatible providers.
+    ``api_key_env`` names the environment variable holding the API key (so keys
+    never live in the config). ``revision`` pins a Hugging Face commit/tag for
+    reproducibility. ``params`` are decoding params passed to the backend.
     """
 
     model_config = ConfigDict(extra="forbid")
 
     id: str = Field(min_length=1)
     backend: str = "mock"
+    base_url: str | None = None
+    api_key_env: str | None = None
+    revision: str | None = None
     params: dict[str, Any] = Field(default_factory=dict)
 
 
