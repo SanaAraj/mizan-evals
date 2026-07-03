@@ -71,8 +71,8 @@ def test_runs_generation_tasks_across_selected_languages(tmp_path: Path) -> None
     assert all(r.output is not None for r in result.items)
     # Gulf was not selected, so no result should be in Gulf.
     assert all(r.language != Language.GULF for r in result.items)
-    # The retrieval item is not run through an LLM; it is counted as pending.
-    assert result.summary["retrieval_pending"] == 2  # one retrieval item x two models
+    # The retrieval item has no configured retriever; it is counted as pending.
+    assert result.summary["retrieval_pending"] == 1
     assert result.summary["n_results"] == 8
     assert result.summary["n_errors"] == 0
 

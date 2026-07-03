@@ -18,8 +18,10 @@ from pathlib import Path
 from mizan import __version__
 from mizan.config import ConfigError, RunConfig, load_config
 from mizan.dataset import DatasetError, load_items
+from mizan.report import retrieval_table
 from mizan.results import RunMetadata
 from mizan.runner import run_eval
+from mizan.schemas import TaskType
 
 DEFAULT_CACHE_DIR = ".mizan_cache"
 
@@ -82,6 +84,11 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     result = run_eval(config, items, metadata, cache_root=Path(args.cache_dir))
     (run_dir / "results.json").write_text(result.model_dump_json(indent=2), encoding="utf-8")
+
+    if any(r.task_type is TaskType.RETRIEVAL and r.scores for r in result.items):
+        table = f"# Retrieval results - {metadata.run_id}\n\n{retrieval_table(result)}\n"
+        (run_dir / "retrieval.md").write_text(table, encoding="utf-8")
+        print("retrieval  : wrote retrieval.md")
 
     summary = result.summary
     print(
