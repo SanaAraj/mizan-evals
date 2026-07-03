@@ -118,3 +118,35 @@ tasks:
     assert config.models[1].api_key_env == "DEEPINFRA_API_KEY"
     assert config.models[2].revision == "abc123"
     assert config.models[0].base_url is None
+
+
+def test_retrievers_require_a_corpus(tmp_path: Path) -> None:
+    cfg = """
+name: ret
+dataset: d.jsonl
+models:
+  - id: mock
+tasks:
+  - retrieval
+retrievers:
+  - id: bm25
+"""
+    with pytest.raises(ConfigError, match="corpus is required"):
+        load_config(_write(tmp_path, cfg))
+
+
+def test_retriever_ids_must_be_unique(tmp_path: Path) -> None:
+    cfg = """
+name: ret
+dataset: d.jsonl
+corpus: c.jsonl
+models:
+  - id: mock
+tasks:
+  - retrieval
+retrievers:
+  - id: bm25
+  - id: bm25
+"""
+    with pytest.raises(ConfigError, match="retriever ids must be unique"):
+        load_config(_write(tmp_path, cfg))
