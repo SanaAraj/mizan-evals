@@ -5,7 +5,15 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from mizan.schemas import EvalItem, ExpectedToolCall, GoldLabel, ItemVariant, Language, TaskType
+from mizan.schemas import (
+    EvalItem,
+    ExpectedToolCall,
+    GoldLabel,
+    ItemVariant,
+    Language,
+    ReviewStatus,
+    TaskType,
+)
 
 
 def _retrieval_item() -> EvalItem:
@@ -28,6 +36,23 @@ def test_valid_retrieval_item_round_trips_with_arabic_preserved() -> None:
     assert restored == item
     # Arabic content must survive serialisation untouched.
     assert restored.variants[Language.MSA].query == "ما هي عاصمة المملكة العربية السعودية؟"
+
+
+def test_review_status_defaults_to_unreviewed() -> None:
+    assert _retrieval_item().review_status is ReviewStatus.UNREVIEWED
+
+
+def test_review_status_round_trips_from_json_value() -> None:
+    dumped = _retrieval_item().model_dump(mode="json")
+    dumped["review_status"] = "llm_qa"
+    assert EvalItem.model_validate(dumped).review_status is ReviewStatus.LLM_QA
+
+
+def test_review_status_rejects_unknown_value() -> None:
+    dumped = _retrieval_item().model_dump(mode="json")
+    dumped["review_status"] = "vibes_checked"
+    with pytest.raises(ValidationError, match="review_status"):
+        EvalItem.model_validate(dumped)
 
 
 def test_languages_property_is_stable_order() -> None:

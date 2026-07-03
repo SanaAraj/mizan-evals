@@ -36,6 +36,21 @@ class TaskType(StrEnum):
     TOOL_CALLING = "tool_calling"
 
 
+class ReviewStatus(StrEnum):
+    """How far an item's content has been quality-checked.
+
+    Datasets must state their review provenance explicitly so published
+    methodology claims can be tied to per-item state: ``UNREVIEWED`` is a raw
+    draft, ``LLM_QA`` passed an LLM cross-lingual consistency and dialect QA
+    pass, and ``NATIVE_REVIEWED`` was additionally reviewed by a native
+    Arabic speaker.
+    """
+
+    UNREVIEWED = "unreviewed"
+    LLM_QA = "llm_qa"
+    NATIVE_REVIEWED = "native_reviewed"
+
+
 class ItemVariant(BaseModel):
     """One language rendering of an evaluation item.
 
@@ -94,6 +109,7 @@ class EvalItem(BaseModel):
     gold: GoldLabel = Field(default_factory=GoldLabel)
     tags: list[str] = Field(default_factory=list)
     source: str = "sample"
+    review_status: ReviewStatus = ReviewStatus.UNREVIEWED
     notes: str | None = None
 
     @model_validator(mode="after")
