@@ -1,9 +1,9 @@
 """The ``mizan`` command-line interface.
 
-Milestone 1 ships the ``run`` skeleton: it loads and validates a YAML config,
-creates a timestamped run folder, and records reproducibility metadata (resolved
-config, model ids, UTC timestamp, tool version). Model execution and scoring are
-wired in later milestones - this command deliberately performs no model calls.
+``mizan run`` loads and validates a YAML config, creates a timestamped run
+folder with reproducibility metadata (resolved config, model ids, UTC timestamp,
+tool version), then executes the evaluation loop and writes ``results.json``.
+``--dry-run`` stops after creating the folder, performing no model calls.
 """
 
 from __future__ import annotations
@@ -17,7 +17,11 @@ from pathlib import Path
 
 from mizan import __version__
 from mizan.config import ConfigError, RunConfig, load_config
+from mizan.dataset import DatasetError, load_items
 from mizan.results import RunMetadata
+from mizan.runner import run_eval
+
+DEFAULT_CACHE_DIR = ".mizan_cache"
 
 
 def _mizan_version() -> str:
@@ -56,24 +60,39 @@ def cmd_run(args: argparse.Namespace) -> int:
     metadata = _make_run_metadata(config, datetime.now(UTC))
     run_dir = output_dir / metadata.run_id
     run_dir.mkdir(parents=True, exist_ok=True)
-
     (run_dir / "metadata.json").write_text(metadata.model_dump_json(indent=2), encoding="utf-8")
-
-    dataset_path = Path(config.dataset)
-    dataset_note = "" if dataset_path.is_file() else "  (not found - referenced by config)"
 
     print(f"run id     : {metadata.run_id}")
     print(f"created_at : {metadata.created_at}")
     print(f"version    : {metadata.mizan_version}")
     print(f"run dir    : {run_dir}")
-    print(f"dataset    : {config.dataset}{dataset_note}")
     print(f"models     : {', '.join(config.model_ids)}")
     print(f"tasks      : {', '.join(t.value for t in config.tasks)}")
     print(f"languages  : {', '.join(lang.value for lang in config.languages)}")
+
+    if args.dry_run:
+        print("note       : dry run - configuration validated, no model calls made.")
+        return 0
+
+    try:
+        items = load_items(config.dataset)
+    except DatasetError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+
+    result = run_eval(config, items, metadata, cache_root=Path(args.cache_dir))
+    (run_dir / "results.json").write_text(result.model_dump_json(indent=2), encoding="utf-8")
+
+    summary = result.summary
     print(
-        "note       : configuration validated and run folder created; "
-        "model execution is not implemented yet (milestone 2)."
+        f"results    : {summary['n_results']} "
+        f"({summary['n_cached']} cached, {summary['n_errors']} errors)"
     )
+    if summary["retrieval_pending"]:
+        print(
+            f"pending    : {summary['retrieval_pending']} retrieval item(s) "
+            "await the retrieval eval (later phase)"
+        )
     return 0
 
 
@@ -86,12 +105,22 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="version", version=f"mizan {_mizan_version()}")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    run_parser = subparsers.add_parser("run", help="validate a config and create a run folder")
+    run_parser = subparsers.add_parser("run", help="run an evaluation from a config")
     run_parser.add_argument("--config", required=True, help="path to a YAML run configuration")
     run_parser.add_argument(
         "--output-dir",
         default=None,
         help="where to create the run folder (overrides output_dir in the config)",
+    )
+    run_parser.add_argument(
+        "--cache-dir",
+        default=DEFAULT_CACHE_DIR,
+        help=f"directory for the resumable LLM cache (default: {DEFAULT_CACHE_DIR})",
+    )
+    run_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="validate config and create the run folder without calling any model",
     )
     run_parser.set_defaults(func=cmd_run)
     return parser
