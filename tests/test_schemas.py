@@ -79,13 +79,37 @@ def test_retrieval_item_requires_relevant_docs() -> None:
         )
 
 
-def test_tool_calling_item_requires_expected_tool() -> None:
-    with pytest.raises(ValidationError, match="expected_tool"):
+def test_tool_calling_item_requires_a_gold_outcome() -> None:
+    with pytest.raises(ValidationError, match="exactly one"):
         EvalItem(
             id="it-tool",
             task_type=TaskType.TOOL_CALLING,
             variants={Language.EN: ItemVariant(query="What's the weather in Dubai?")},
         )
+
+
+def test_tool_calling_item_rejects_both_outcomes() -> None:
+    with pytest.raises(ValidationError, match="exactly one"):
+        EvalItem(
+            id="it-tool-both",
+            task_type=TaskType.TOOL_CALLING,
+            variants={Language.EN: ItemVariant(query="What's the weather in Dubai?")},
+            gold=GoldLabel(
+                expected_tool=ExpectedToolCall(name="get_weather", arguments={"location": "Dubai"}),
+                expected_no_tool=True,
+            ),
+        )
+
+
+def test_tool_calling_distractor_is_valid_with_expected_no_tool() -> None:
+    item = EvalItem(
+        id="it-tool-distractor",
+        task_type=TaskType.TOOL_CALLING,
+        variants={Language.EN: ItemVariant(query="What do you think of my new haircut?")},
+        gold=GoldLabel(expected_no_tool=True),
+    )
+    assert item.gold.expected_no_tool is True
+    assert item.gold.expected_tool is None
 
 
 def test_tool_calling_item_is_valid_with_expected_tool() -> None:

@@ -80,12 +80,20 @@ class ExpectedToolCall(BaseModel):
 
 
 class GoldLabel(BaseModel):
-    """Language-independent gold outcome shared by all variants of an item."""
+    """Language-independent gold outcome shared by all variants of an item.
+
+    For a tool-calling item, exactly one of two mutually exclusive outcomes is
+    gold: ``expected_tool`` names the call the model should make, or
+    ``expected_no_tool`` marks a distractor intent where the correct behaviour is
+    to call nothing. Distractors make the refusal / hallucinated-tool rates
+    measurable rather than assumed.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
     relevant_doc_ids: list[str] = Field(default_factory=list)
     expected_tool: ExpectedToolCall | None = None
+    expected_no_tool: bool = False
 
 
 class EvalItem(BaseModel):
@@ -95,7 +103,8 @@ class EvalItem(BaseModel):
 
     - ``variants`` must include English and be non-empty.
     - A ``retrieval`` item must have at least one relevant document.
-    - A ``tool_calling`` item must have an expected tool call.
+    - A ``tool_calling`` item must have exactly one of an expected tool call or
+      ``expected_no_tool`` (a no-tool distractor).
     - An ``answer_quality`` or ``faithfulness`` item must supply a reference
       answer for every variant; ``faithfulness`` additionally needs context
       documents to check the answer against.
@@ -122,8 +131,14 @@ class EvalItem(BaseModel):
         if self.task_type is TaskType.RETRIEVAL and not self.gold.relevant_doc_ids:
             raise ValueError(f"item {self.id!r}: retrieval items need gold.relevant_doc_ids")
 
-        if self.task_type is TaskType.TOOL_CALLING and self.gold.expected_tool is None:
-            raise ValueError(f"item {self.id!r}: tool_calling items need gold.expected_tool")
+        if self.task_type is TaskType.TOOL_CALLING:
+            has_tool = self.gold.expected_tool is not None
+            if has_tool == self.gold.expected_no_tool:
+                raise ValueError(
+                    f"item {self.id!r}: tool_calling items need exactly one of "
+                    "gold.expected_tool (a positive intent) or gold.expected_no_tool=true "
+                    "(a distractor)"
+                )
 
         if self.task_type in (TaskType.ANSWER_QUALITY, TaskType.FAITHFULNESS):
             missing = [

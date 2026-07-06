@@ -30,7 +30,15 @@ class RunMetadata(BaseModel):
 
 
 class ItemResult(BaseModel):
-    """The outcome of evaluating one item, in one language, with one model."""
+    """The outcome of evaluating one item, in one language, with one model.
+
+    ``error`` records a backend/transport failure (the call never returned usable
+    output). ``parse_error`` is distinct: the call returned, but its output could
+    not be parsed into a tool call — such items are scored as incorrect, never
+    dropped, and counted separately so parser fragility is visible. ``chosen_tool``
+    records the extracted tool name (or ``None`` for a no-call) so failures can be
+    inspected by item id.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
@@ -42,6 +50,8 @@ class ItemResult(BaseModel):
     scores: dict[str, float] = Field(default_factory=dict)
     cached: bool = False
     error: str | None = None
+    parse_error: str | None = None
+    chosen_tool: str | None = None
 
 
 class RunResult(BaseModel):
