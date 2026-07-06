@@ -7,9 +7,12 @@ DeepInfra) - they differ only by ``base_url``, API key, and model id.
 
 from __future__ import annotations
 
+import json
+
 import httpx
 
 from mizan.llm.base import Backend, BackendError, GenerationParams
+from mizan.tools.extract import to_canonical_json
 
 
 class OpenAICompatibleBackend(Backend):
@@ -42,6 +45,10 @@ class OpenAICompatibleBackend(Backend):
     def model_id(self) -> str:
         return self._model_id
 
+    @property
+    def supports_native_tools(self) -> bool:
+        return True
+
     def generate(self, prompt: str, params: GenerationParams) -> str:
         payload: dict[str, object] = {
             "model": self._model_id,
@@ -51,7 +58,25 @@ class OpenAICompatibleBackend(Backend):
         }
         if params.seed is not None:
             payload["seed"] = params.seed
+        return self._extract_text(self._post(payload))
 
+    def generate_tool_call(
+        self, utterance: str, tools: list[dict], params: GenerationParams
+    ) -> str:
+        """Call the endpoint's native function-calling API and canonicalize it."""
+        payload: dict[str, object] = {
+            "model": self._model_id,
+            "messages": [{"role": "user", "content": utterance}],
+            "temperature": params.temperature,
+            "max_tokens": params.max_tokens,
+            "tools": tools,
+            "tool_choice": "auto",
+        }
+        if params.seed is not None:
+            payload["seed"] = params.seed
+        return self._extract_tool_call(self._post(payload))
+
+    def _post(self, payload: dict[str, object]) -> dict:
         try:
             response = self._client.post(
                 f"{self._base_url}/chat/completions",
@@ -66,8 +91,7 @@ class OpenAICompatibleBackend(Backend):
                 f"{self._model_id}: HTTP {response.status_code} from {self._base_url}: "
                 f"{response.text[:500]}"
             )
-
-        return self._extract_text(response.json())
+        return response.json()
 
     def _extract_text(self, body: dict) -> str:
         try:
@@ -77,3 +101,33 @@ class OpenAICompatibleBackend(Backend):
         if content is None:
             raise BackendError(f"{self._model_id}: response contained no content")
         return str(content)
+
+    def _extract_tool_call(self, body: dict) -> str:
+        """Reduce a chat-completions response to canonical tool-call JSON.
+
+        A response with no ``tool_calls`` is a legitimate no-call decision and is
+        serialized as ``{"tool": null}``. Malformed argument JSON from the provider
+        is preserved as empty arguments rather than crashing the run — the scorer
+        then marks the arguments wrong, which is the truthful outcome.
+        """
+        try:
+            message = body["choices"][0]["message"]
+        except (KeyError, IndexError, TypeError) as exc:
+            raise BackendError(f"{self._model_id}: unexpected response shape: {body!r}") from exc
+
+        tool_calls = message.get("tool_calls") or []
+        if not tool_calls:
+            return to_canonical_json(None, {})
+
+        call = tool_calls[0].get("function", {})
+        name = call.get("name")
+        if not name:
+            raise BackendError(f"{self._model_id}: tool_call missing a function name: {body!r}")
+        raw_args = call.get("arguments") or "{}"
+        try:
+            arguments = json.loads(raw_args) if isinstance(raw_args, str) else dict(raw_args)
+        except (json.JSONDecodeError, TypeError, ValueError):
+            arguments = {}
+        if not isinstance(arguments, dict):
+            arguments = {}
+        return to_canonical_json(str(name), arguments)

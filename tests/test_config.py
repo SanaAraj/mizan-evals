@@ -118,6 +118,42 @@ tasks:
     assert config.models[1].api_key_env == "DEEPINFRA_API_KEY"
     assert config.models[2].revision == "abc123"
     assert config.models[0].base_url is None
+    # tool_mode defaults to auto.
+    assert config.models[0].tool_mode == "auto"
+
+
+def test_tool_mode_accepts_known_values(tmp_path: Path) -> None:
+    cfg = """
+name: modes
+dataset: d.jsonl
+models:
+  - id: gpt
+    backend: openai
+    tool_mode: native
+  - id: allam
+    backend: hf
+    tool_mode: prompt
+tasks:
+  - tool_calling
+"""
+    config = load_config(_write(tmp_path, cfg))
+    assert config.models[0].tool_mode == "native"
+    assert config.models[1].tool_mode == "prompt"
+
+
+def test_tool_mode_rejects_unknown_value(tmp_path: Path) -> None:
+    cfg = """
+name: bad-mode
+dataset: d.jsonl
+models:
+  - id: gpt
+    backend: openai
+    tool_mode: magic
+tasks:
+  - tool_calling
+"""
+    with pytest.raises(ConfigError, match="tool_mode must be one of"):
+        load_config(_write(tmp_path, cfg))
 
 
 def test_retrievers_require_a_corpus(tmp_path: Path) -> None:

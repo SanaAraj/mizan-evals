@@ -33,6 +33,11 @@ class ModelSpec(BaseModel):
     ``api_key_env`` names the environment variable holding the API key (so keys
     never live in the config). ``revision`` pins a Hugging Face commit/tag for
     reproducibility. ``params`` are decoding params passed to the backend.
+
+    ``tool_mode`` selects how tool calls are extracted: ``native`` uses the
+    backend's function-calling API, ``prompt`` uses the strict JSON prompt-based
+    fallback, and ``auto`` (the default) picks native when the backend supports it
+    and prompt otherwise.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -42,7 +47,18 @@ class ModelSpec(BaseModel):
     base_url: str | None = None
     api_key_env: str | None = None
     revision: str | None = None
+    tool_mode: str = "auto"
     params: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def _check_tool_mode(self) -> ModelSpec:
+        allowed = {"auto", "native", "prompt"}
+        if self.tool_mode not in allowed:
+            raise ValueError(
+                f"model {self.id!r}: tool_mode must be one of {sorted(allowed)}, "
+                f"got {self.tool_mode!r}"
+            )
+        return self
 
 
 class RetrieverSpec(BaseModel):

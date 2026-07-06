@@ -51,3 +51,28 @@ class Backend(ABC):
     @abstractmethod
     def generate(self, prompt: str, params: GenerationParams) -> str:
         """Return the model's completion for ``prompt`` under ``params``."""
+
+    @property
+    def supports_native_tools(self) -> bool:
+        """Whether this backend has a native function-calling API.
+
+        Backends returning ``False`` are driven through the prompt-based
+        tool-calling fallback instead; the default is ``False`` so a backend must
+        opt in explicitly.
+        """
+        return False
+
+    def generate_tool_call(
+        self, utterance: str, tools: list[dict], params: GenerationParams
+    ) -> str:
+        """Return a native tool call as canonical-contract JSON.
+
+        The return value must be a JSON string of the form
+        ``{"tool": <name|null>, "arguments": {...}}`` (see
+        :func:`mizan.tools.extract.to_canonical_json`), so it can be cached as
+        plain text and parsed back with :func:`mizan.tools.extract.parse_native`.
+
+        Raises:
+            BackendError: by default, since native tool calling is opt-in.
+        """
+        raise BackendError(f"{self.model_id}: backend has no native tool-calling support")

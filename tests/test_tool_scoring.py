@@ -105,7 +105,7 @@ def test_hallucinated_tool_flagged() -> None:
 
 
 def test_parse_failure_scored_as_incorrect_no_call() -> None:
-    scores = score_tool_item(WEATHER_GOLD, chosen_tool=None, arguments={}, parse_error="not json")
+    scores = score_tool_item(WEATHER_GOLD, chosen_tool=None, arguments={}, failed=True)
     assert scores[TOOL_CORRECT] == 0.0
     assert scores[HALLUCINATED] == 0.0
 
@@ -124,8 +124,8 @@ def test_distractor_wrong_call_is_not_refusal() -> None:
     assert scores[HALLUCINATED] == 0.0
 
 
-def test_distractor_parse_failure_is_not_refusal() -> None:
-    scores = score_tool_item(DISTRACTOR_GOLD, chosen_tool=None, arguments={}, parse_error="bad")
+def test_distractor_failed_call_is_not_refusal() -> None:
+    scores = score_tool_item(DISTRACTOR_GOLD, chosen_tool=None, arguments={}, failed=True)
     assert scores[REFUSED] == 0.0
 
 
@@ -192,7 +192,7 @@ def test_aggregate_localization_none_when_no_localizable_correct() -> None:
 def test_aggregate_counts_parse_errors() -> None:
     results = [
         _item(
-            score_tool_item(WEATHER_GOLD, chosen_tool=None, arguments={}, parse_error="x"),
+            score_tool_item(WEATHER_GOLD, chosen_tool=None, arguments={}, failed=True),
             parse_error="x",
         ),
     ]

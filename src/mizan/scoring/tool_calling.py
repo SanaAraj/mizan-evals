@@ -78,17 +78,18 @@ def score_tool_item(
     *,
     chosen_tool: str | None,
     arguments: Mapping[str, Any],
-    parse_error: str | None = None,
+    failed: bool = False,
 ) -> dict[str, float]:
     """Score one extracted tool call against an item's gold label.
 
     Args:
         gold: the item's gold label (either an expected tool or ``expected_no_tool``).
         chosen_tool: the tool name the model selected, or ``None`` for no call
-            (including when extraction failed to parse).
+            (including when extraction or the backend call failed).
         arguments: the arguments the model supplied.
-        parse_error: set when the model output could not be parsed; the item is
-            still scored (as incorrect), never dropped.
+        failed: whether the call did not yield a usable decision (a parse failure
+            or a backend error). Such an item is still scored — as incorrect, and
+            never counted as a distractor refusal — rather than dropped.
 
     Returns:
         A flat mapping of per-item numeric signals for :func:`aggregate`.
@@ -101,8 +102,8 @@ def score_tool_item(
     }
 
     if is_distractor:
-        # Correct behaviour is to call nothing. A parse failure is not a refusal.
-        scores[REFUSED] = float(chosen_tool is None and parse_error is None)
+        # Correct behaviour is to call nothing. A failed call is not a refusal.
+        scores[REFUSED] = float(chosen_tool is None and not failed)
         return scores
 
     expected = gold.expected_tool

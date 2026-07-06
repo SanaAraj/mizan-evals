@@ -18,7 +18,7 @@ from pathlib import Path
 from mizan import __version__
 from mizan.config import ConfigError, RunConfig, load_config
 from mizan.dataset import DatasetError, load_items
-from mizan.report import retrieval_table
+from mizan.report import retrieval_table, tool_calling_table
 from mizan.results import RunMetadata
 from mizan.runner import run_eval
 from mizan.schemas import TaskType
@@ -89,6 +89,11 @@ def cmd_run(args: argparse.Namespace) -> int:
         table = f"# Retrieval results - {metadata.run_id}\n\n{retrieval_table(result)}\n"
         (run_dir / "retrieval.md").write_text(table, encoding="utf-8")
         print("retrieval  : wrote retrieval.md")
+
+    if any(r.task_type is TaskType.TOOL_CALLING for r in result.items):
+        table = f"# Tool-calling results - {metadata.run_id}\n\n{tool_calling_table(result)}\n"
+        (run_dir / "tool_calling.md").write_text(table, encoding="utf-8")
+        print("tool call  : wrote tool_calling.md")
 
     summary = result.summary
     print(

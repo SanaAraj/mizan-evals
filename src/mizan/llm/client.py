@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from collections.abc import Callable
 from pathlib import Path
 
 from mizan.llm.base import Backend, GenerationParams, LLMResponse
@@ -57,15 +58,32 @@ class CachedLLMClient:
         so a partially-written file from an interrupted run cannot wedge a rerun.
         """
         params = params or GenerationParams()
-        key = self._cache_key(prompt, params)
+        return self.cached_call(prompt, params, lambda: self.backend.generate(prompt, params))
+
+    def cached_call(
+        self,
+        cache_key: str,
+        params: GenerationParams,
+        producer: Callable[[], str],
+    ) -> LLMResponse:
+        """Serve ``producer()``'s string output from disk cache, keyed by ``cache_key``.
+
+        This is the shared, resumable primitive behind both plain generation and
+        tool calling: the caller decides what raw string to cache (a completion, or
+        a canonical-JSON tool call) and how to produce it on a miss, while caching,
+        atomic writes, and corrupt-entry recovery live here. ``cache_key`` must
+        capture everything that changes the output (prompt or utterance, tool set,
+        extraction mode) so distinct calls never collide.
+        """
+        key = self._cache_key(cache_key, params)
         path = self._cache_path(key)
 
         cached_text = self._read_cache(path)
         if cached_text is not None:
             return LLMResponse(text=cached_text, model_id=self.backend.model_id, cached=True)
 
-        text = self.backend.generate(prompt, params)
-        self._write_cache(path, prompt, params, text)
+        text = producer()
+        self._write_cache(path, cache_key, params, text)
         return LLMResponse(text=text, model_id=self.backend.model_id, cached=False)
 
     def _read_cache(self, path: Path) -> str | None:
