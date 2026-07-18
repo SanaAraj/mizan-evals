@@ -1,5 +1,11 @@
 # Retrieval results - 20260703T030732Z-retrieval-bm25-arwiki
 
+> This run predates the Gulf-dialect QA pass that rephrased six queries
+> (see [data/retrieval/README.md](../../../data/retrieval/README.md)), so its
+> Gulf row differs from the headline table in the top-level README. It is kept
+> as the citable English-floor measurement; the English and MSA rows are
+> unaffected by the rephrase.
+
 | System | Language | recall@1 | recall@3 | recall@5 | recall@10 | MRR | n |
 |---|---|---|---|---|---|---|---|
 | bm25 | en | 0.000 | 0.067 | 0.067 | 0.133 | 0.043 | 15 |
