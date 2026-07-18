@@ -8,7 +8,7 @@ Gulf dialect**.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
 
-> _Mīzān_ (ميزان) — "scale" / "balance". The tool weighs models fairly across
+> _Mīzān_ (ميزان) - "scale" / "balance". The tool weighs models fairly across
 > languages.
 
 ## Why this exists
@@ -22,7 +22,7 @@ that answer is reproducible from scratch and dated.
 
 ## Results
 
-**Retrieval quality — BM25 lexical baseline** over the 15-item arwiki slice
+**Retrieval quality - BM25 lexical baseline** over the 15-item arwiki slice
 (run 2026-07-03, offline and deterministic; regenerate with
 `mizan run --config configs/retrieval-bm25.yaml`; archived run:
 [`runs/archive/20260703T034326Z-retrieval-bm25-arwiki/`](runs/archive/20260703T034326Z-retrieval-bm25-arwiki/retrieval.md)):
@@ -33,12 +33,12 @@ that answer is reproducible from scratch and dated.
 | bm25 | gulf | 0.356 | 0.622 | 0.622 | 0.756 | 0.541 | 15 |
 
 On the same intents and corpus, BM25 loses ~18 points of recall@1 when the
-query is phrased in Gulf dialect instead of MSA — the dialect gap this harness
+query is phrased in Gulf dialect instead of MSA - the dialect gap this harness
 is built to measure. The English lexical baseline over the Arabic corpus is
 near zero by construction and is archived rather than tabulated; see
 Limitations.
 
-**Tool-calling accuracy** — the headline comparison (per language), lands in
+**Tool-calling accuracy** - the headline comparison (per language), lands in
 Milestone 2:
 
 | Model | Language | correct-tool rate | argument accuracy | hallucinated-tool rate |
@@ -175,7 +175,7 @@ mrr([(["x", "arwiki:الرياض#0"], {"arwiki:الرياض#0"})])              
 - **English is excluded from the lexical retrieval table.** Measured once and
   [archived](runs/archive/20260703T030732Z-retrieval-bm25-arwiki/retrieval.md),
   BM25 for English queries over the Arabic corpus scores recall@5 = 0.067,
-  MRR = 0.043 — near zero by construction, since English shares almost no
+  MRR = 0.043 - near zero by construction, since English shares almost no
   surface forms with the corpus. That floor is a finding in itself and the
   motivation for the Milestone 3 dense-retrieval comparison, where
   cross-lingual retrieval becomes meaningful. English remains fully in scope

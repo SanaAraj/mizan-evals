@@ -75,7 +75,7 @@ def _split_oversized(paragraph: str, max_chars: int) -> list[str]:
     """Break a paragraph longer than ``max_chars`` into pieces within the limit.
 
     Sentences are grouped first; a single sentence that still exceeds the limit
-    (rare — no terminal punctuation) is hard-split on word boundaries. Every
+    (rare - no terminal punctuation) is hard-split on word boundaries. Every
     returned piece is ``<= max_chars`` as long as no single word exceeds it.
     """
     sentences: list[str] = []

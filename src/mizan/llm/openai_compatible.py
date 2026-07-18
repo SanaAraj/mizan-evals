@@ -107,7 +107,7 @@ class OpenAICompatibleBackend(Backend):
 
         A response with no ``tool_calls`` is a legitimate no-call decision and is
         serialized as ``{"tool": null}``. Malformed argument JSON from the provider
-        is preserved as empty arguments rather than crashing the run — the scorer
+        is preserved as empty arguments rather than crashing the run - the scorer
         then marks the arguments wrong, which is the truthful outcome.
         """
         try:

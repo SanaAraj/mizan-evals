@@ -1,10 +1,10 @@
 # BM25 retrieval evaluation over the pinned Arabic Wikipedia corpus.
 #
-# Scores recall@k and MRR for the retrieval slice across MSA and Gulf dialect —
+# Scores recall@k and MRR for the retrieval slice across MSA and Gulf dialect -
 # the headline lexical comparison. English is excluded here: an English query
 # over an Arabic corpus shares almost no surface forms with it, so the lexical
 # baseline is near zero by construction (measured once; archived under
-# runs/archive/). Runs fully offline (BM25 is lexical — no API keys, no model
+# runs/archive/). Runs fully offline (BM25 is lexical - no API keys, no model
 # calls). Reproduces the retrieval table under runs/<run-id>/retrieval.md.
 
 name: retrieval-bm25-arwiki

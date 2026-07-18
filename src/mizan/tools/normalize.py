@@ -3,7 +3,7 @@
 Gold arguments are stored in one canonical English form (``"Riyadh"``, ``"SAR"``,
 ``"tomorrow"``). A model answering an Arabic query will often emit the *localized*
 surface form instead (``"الرياض"``, ``"ريال"``, ``"بكرة"``). Treating that as
-wrong would confound two different things — the model picking the wrong value, and
+wrong would confound two different things - the model picking the wrong value, and
 the model simply not translating the value into English. This layer resolves a
 produced value through per-category alias tables so a localized-but-correct value
 scores as a match, and separately reports *whether* an alias was needed, which is
@@ -150,7 +150,7 @@ _ALIASES: dict[str, str] = {
     for group in _ALIAS_GROUPS.values()
     for surface, canonical in group.items()
 }
-# The set of canonical values that *have* a localized alias — i.e. the arguments
+# The set of canonical values that *have* a localized alias - i.e. the arguments
 # for which "localization" is even meaningful (the denominator of the rate).
 _LOCALIZABLE: frozenset[str] = frozenset(_ALIASES.values())
 
@@ -202,7 +202,7 @@ def match_argument(gold_value: object, produced_value: object) -> ArgumentMatch:
     A value matches if it resolves to the same canonical form as gold (after
     alias resolution) or is numerically equal. ``localizable`` says the gold
     value has a localized alias at all; ``localized`` says the model produced that
-    localized form for a value that matched — the signal the localization rate is
+    localized form for a value that matched - the signal the localization rate is
     computed from.
     """
     gold = resolve_value(gold_value)

@@ -5,14 +5,14 @@ information-need items, each expressed in parallel across **English**, **Modern
 Standard Arabic (`msa`)**, and **Gulf dialect (`gulf`)**, with a single
 language-independent gold label (`gold.relevant_doc_ids`).
 
-- **Corpus:** `../corpus/arwiki.jsonl` — 12 pinned Arabic Wikipedia revisions
+- **Corpus:** `../corpus/arwiki.jsonl` - 12 pinned Arabic Wikipedia revisions
   (CC BY-SA 4.0). Gold ids are chunk ids in that corpus; every gold id resolves.
 - **Construction:** each query targets a specific fact located in a specific
   corpus chunk; the gold chunk was read to confirm it answers the query.
 - **Drafting and QA:** queries were LLM-drafted. An LLM QA pass (2026-07-03)
   checked cross-lingual semantic consistency (the en/msa/gulf variants ask the
-  same question), MSA grammaticality, and Gulf dialect plausibility — six Gulf
-  drafts that read as translated MSA were rephrased — and re-verified that
+  same question), MSA grammaticality, and Gulf dialect plausibility - six Gulf
+  drafts that read as translated MSA were rephrased - and re-verified that
   every gold chunk contains the answer. Gold-label decisions (added
   alternates, one rejected candidate, the r-011 scoping) were approved by the
   maintainer via chat on 2026-07-03; each is recorded in that item's `notes`.

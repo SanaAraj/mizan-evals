@@ -2,16 +2,16 @@
 
 Two extraction paths feed one representation, :class:`ToolCallResult`:
 
-- **Native** — for backends with a function-calling API (GPT, Qwen). The backend
+- **Native** - for backends with a function-calling API (GPT, Qwen). The backend
   emits its tool call already serialized into this module's canonical JSON
   contract (``{"tool": <name|null>, "arguments": {...}}``); :func:`parse_native`
   reads it back.
-- **Prompt** — for backends without a tools API (e.g. ALLaM). We render the tool
+- **Prompt** - for backends without a tools API (e.g. ALLaM). We render the tool
   schemas into a strict instruction with :func:`build_tool_prompt`, and
   :func:`parse_prompt_output` robustly recovers the JSON object from free-form
   text (stripping code fences and surrounding prose).
 
-A no-tool decision (``{"tool": null}``) is a *valid* parse, not an error — it is
+A no-tool decision (``{"tool": null}``) is a *valid* parse, not an error - it is
 exactly how a model should answer a distractor. A ``parse_error`` is reserved for
 output that could not be interpreted at all; such items are scored as incorrect
 and never dropped.
@@ -70,7 +70,7 @@ def build_tool_prompt(tools: list[ToolSpec], utterance: str) -> str:
     ]
     for i, tool in enumerate(tools, start=1):
         schema = json.dumps(tool.parameters, ensure_ascii=False, sort_keys=True)
-        lines.append(f"{i}. {tool.name} — {tool.description}")
+        lines.append(f"{i}. {tool.name} - {tool.description}")
         lines.append(f"   parameters: {schema}")
     lines += [
         "",

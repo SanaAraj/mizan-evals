@@ -2,7 +2,7 @@
 #
 # Each entry pins one article to an EXACT revision id. scripts/build_corpus.py
 # fetches the plaintext extract for the (canonical) title and refuses to build if
-# the live revision no longer matches the pinned `revid` — so the committed
+# the live revision no longer matches the pinned `revid` - so the committed
 # corpus (data/corpus/arwiki.jsonl) is reproducible from a known source state.
 #
 # Titles are the canonical (post-redirect) article titles. To add or re-pin an

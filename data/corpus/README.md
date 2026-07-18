@@ -1,4 +1,4 @@
-# Retrieval corpus — Arabic Wikipedia extract
+# Retrieval corpus - Arabic Wikipedia extract
 
 `arwiki.jsonl` is the document corpus used by the retrieval evaluation. It is
 built from a fixed set of **pinned Arabic Wikipedia revisions** so that the
@@ -21,7 +21,7 @@ committed corpus is reproducible from a known source state.
 1. `manifest.yaml` pins each article title to an exact `revid`.
 2. `scripts/build_corpus.py` fetches each article's plaintext extract from the
    MediaWiki API, and **refuses to build if the live revision no longer matches
-   the pinned `revid`** — so a rebuild either reproduces the same source text or
+   the pinned `revid`** - so a rebuild either reproduces the same source text or
    fails loudly asking you to review and re-pin.
 3. Text is split into paragraphs and packed into deterministic chunks
    (`src/mizan/corpus_build.py`); ids follow `arwiki:<title-slug>#<chunk-index>`.

@@ -1,6 +1,6 @@
 # Sample evaluation items
 
-These **10 items are a format reference only** — they exist to demonstrate the
+These **10 items are a format reference only** - they exist to demonstrate the
 schema and to give the loader something real to validate against. They are not
 the evaluation set. The full dataset (100–200 items) is authored and
 native-speaker reviewed separately.

@@ -1,6 +1,6 @@
 """The fixed set of ten mock tools the tool-calling eval selects between.
 
-The tools are invented for the benchmark — no tool calls a real service — but
+The tools are invented for the benchmark - no tool calls a real service - but
 their schemas are realistic: required/optional split, typed parameters, and
 ``enum``s where a real API would constrain a value. The set is deliberately
 diverse so that intents can be unambiguous (one clearly-correct tool per intent)

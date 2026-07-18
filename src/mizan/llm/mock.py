@@ -7,8 +7,8 @@ and lets the cache be exercised meaningfully.
 
 The mock also implements both tool-calling paths so the full tool-calling
 pipeline can be run end-to-end offline (Phase 3B): it picks a tool
-deterministically from the utterance. The choice is arbitrary — the mock is not a
-system under test and its accuracy is meaningless — but it is stable, which is all
+deterministically from the utterance. The choice is arbitrary - the mock is not a
+system under test and its accuracy is meaningless - but it is stable, which is all
 the pipeline-structure check needs.
 """
 
@@ -20,9 +20,9 @@ import re
 from mizan.llm.base import Backend, GenerationParams
 from mizan.tools.extract import to_canonical_json
 
-# Matches the "1. tool_name — description" lines rendered by build_tool_prompt,
+# Matches the "1. tool_name - description" lines rendered by build_tool_prompt,
 # so the prompt-mode mock can recover the offered tool names.
-_PROMPT_TOOL_LINE = re.compile(r"^\s*\d+\.\s+([a-z_]+)\s+—", re.MULTILINE)
+_PROMPT_TOOL_LINE = re.compile(r"^\s*\d+\.\s+([a-z_]+)\s+-", re.MULTILINE)
 
 
 class MockBackend(Backend):

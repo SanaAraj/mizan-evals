@@ -9,19 +9,19 @@ item) while keeping the aggregation logic in one tested place.
 
 Metrics (all conditioned as noted):
 
-- **correct_tool_rate** — over positive items, fraction where the model selected
+- **correct_tool_rate** - over positive items, fraction where the model selected
   the gold tool. A parse failure or a no-call counts as incorrect.
-- **argument_accuracy** — over positive items *where the correct tool was
+- **argument_accuracy** - over positive items *where the correct tool was
   selected*, the mean fraction of gold arguments matched (after alias
   normalization). Arguments are meaningless when the wrong tool fired, so those
   items are excluded from this mean.
-- **exact_match_rate** — over positive items, fraction where the tool and *every*
+- **exact_match_rate** - over positive items, fraction where the tool and *every*
   gold argument matched with no spurious arguments. A strict secondary view.
-- **hallucinated_tool_rate** — over all items, fraction where the model invoked a
+- **hallucinated_tool_rate** - over all items, fraction where the model invoked a
   tool name that is not in the registry.
-- **refusal_on_distractor_rate** — over distractor items, fraction where the model
+- **refusal_on_distractor_rate** - over distractor items, fraction where the model
   correctly called no tool.
-- **localization_rate** — over correctly-matched, localizable arguments, the
+- **localization_rate** - over correctly-matched, localizable arguments, the
   fraction the model left in localized (non-English) form. Reported per language
   as a behavioural finding, not an error.
 """
@@ -88,8 +88,8 @@ def score_tool_item(
             (including when extraction or the backend call failed).
         arguments: the arguments the model supplied.
         failed: whether the call did not yield a usable decision (a parse failure
-            or a backend error). Such an item is still scored — as incorrect, and
-            never counted as a distractor refusal — rather than dropped.
+            or a backend error). Such an item is still scored - as incorrect, and
+            never counted as a distractor refusal - rather than dropped.
 
     Returns:
         A flat mapping of per-item numeric signals for :func:`aggregate`.

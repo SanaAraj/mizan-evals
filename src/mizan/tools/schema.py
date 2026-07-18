@@ -10,7 +10,7 @@ into text.
 :func:`validate_arguments` is a deliberately small JSON-Schema checker: it covers
 only the constructs the tool registry actually uses (``object`` with typed
 ``properties``, ``required``, and string ``enum``s). It is used to sanity-check
-gold arguments in tests, not to police live model output — a model that emits an
+gold arguments in tests, not to police live model output - a model that emits an
 argument violating the schema is simply scored as wrong by the tool-calling
 scorer.
 """
